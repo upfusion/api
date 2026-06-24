@@ -1,0 +1,29 @@
+# ============================================
+# Upfusion Audio Streaming API
+# ============================================
+# Streams MP3 files for upfusion.net - no downloads
+# Requires: www-network (created by proxy)
+
+services:
+  upfusion-api:
+    image: nginx:alpine
+    container_name: upfusion-api
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./music:/music:ro
+    networks:
+      - www-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    labels:
+      - "com.upfusion.service=audio-api"
+      - "com.upfusion.environment=production"
+
+networks:
+  www-network:
+    external: true

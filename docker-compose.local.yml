@@ -1,0 +1,12 @@
+# Local testing - exposes port, creates network, allows localhost referer
+services:
+  upfusion-api:
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx.local.conf:/etc/nginx/nginx.conf:ro
+      - ./music:/music:ro
+
+networks:
+  www-network:
+    external: false

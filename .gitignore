@@ -1,0 +1,5 @@
+# Audio files - not committed to repo
+music/**/*.mp3
+music/**/*.wav
+music/**/*.flac
+music/**/*.m4a
