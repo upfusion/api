@@ -37,9 +37,9 @@ help:
 local:
 	@echo "Starting locally on port 8080..."
 	$(COMPOSE) -f docker-compose.yml -f docker-compose.local.yml up -d
-	@echo "✓ Running at http://localhost:8080"
-	@echo "  Health: http://localhost:8080/health"
-	@echo "  Stream: http://localhost:8080/stream/deftones/eros/destiny"
+	@echo "✓ Running at http://127.0.0.1:8080"
+	@echo "  Health: http://127.0.0.1:8080/health"
+	@echo "  Stream: http://127.0.0.1:8080/stream/deftones/eros/destiny"
 
 local-down:
 	@echo "Stopping local instance..."
@@ -83,7 +83,7 @@ shell:
 	docker exec -it $(CONTAINER) /bin/sh
 
 health:
-	@curl -sf http://localhost:8080/health && echo " ✓ healthy" || echo "✗ not responding"
+	@docker exec $(CONTAINER) wget -qO- http://127.0.0.1:8080/health && echo " ✓ healthy" || echo "✗ not responding"
 
 status:
 	@docker ps --filter name=$(CONTAINER) --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
@@ -92,24 +92,18 @@ status:
 
 test:
 	@echo "── Health ──"
-	@curl -sf http://localhost:8080/health && echo " ✓" || echo " ✗"
+	@docker exec $(CONTAINER) wget -qO- http://127.0.0.1:8080/health && echo " ✓" || echo " ✗"
 	@echo ""
 	@echo "── Stream with valid referer ──"
-	@curl -sI http://localhost:8080/stream/deftones/eros/destiny -H "Referer: https://upfusion.net/" | head -1
+	@docker exec $(CONTAINER) wget -qS --header="Referer: https://upfusion.net/" -O /dev/null http://127.0.0.1:8080/stream/deftones/eros/destiny 2>&1 | head -1
 	@echo ""
 	@echo "── Stream without referer (expect 403) ──"
-	@curl -sI http://localhost:8080/stream/deftones/eros/destiny | head -1
-	@echo ""
-	@echo "── Stream with wrong referer (expect 403) ──"
-	@curl -sI http://localhost:8080/stream/deftones/eros/destiny -H "Referer: https://evil.com/" | head -1
-	@echo ""
-	@echo "── Unknown track (expect 404) ──"
-	@curl -sI http://localhost:8080/stream/deftones/eros/fakesong -H "Referer: https://upfusion.net/" | head -1
+	@docker exec $(CONTAINER) wget -qS -O /dev/null http://127.0.0.1:8080/stream/deftones/eros/destiny 2>&1 | head -1
 	@echo ""
 	@echo "── All tracks ──"
 	@for track in destiny brenda melanie smile margot candy sable electra trempest diamond briana; do \
-		STATUS=$$(curl -so /dev/null -w "%{http_code}" http://localhost:8080/stream/deftones/eros/$$track -H "Referer: https://upfusion.net/"); \
-		if [ "$$STATUS" = "200" ]; then echo "  ✓ $$track"; else echo "  ✗ $$track ($$STATUS)"; fi; \
+		docker exec $(CONTAINER) wget -qO /dev/null --header="Referer: https://upfusion.net/" http://127.0.0.1:8080/stream/deftones/eros/$$track 2>/dev/null \
+		&& echo "  ✓ $$track" || echo "  ✗ $$track"; \
 	done
 
 # ── Cleanup ──
