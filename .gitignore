@@ -3,3 +3,5 @@ music/**/*.mp3
 music/**/*.wav
 music/**/*.flac
 music/**/*.m4a
+
+.DS_Store
