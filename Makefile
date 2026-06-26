@@ -1,4 +1,4 @@
-.PHONY: help local local-down run down restart reload logs shell health check-config status clean test
+.PHONY: help local local-down run down restart reload build logs shell health check-config status clean test
 
 # Variables
 COMPOSE := docker compose
@@ -50,9 +50,14 @@ local-down:
 
 run:
 	@echo "Starting on server..."
-	$(COMPOSE) up -d
+	$(COMPOSE) up -d --build
 	@echo "✓ Running on www-network"
 	@echo "  Health: make health"
+
+build:
+	@echo "Building with no cache..."
+	$(COMPOSE) build --no-cache
+	@echo "✓ Built"
 
 down:
 	@echo "Stopping..."
