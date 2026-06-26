@@ -1,4 +1,4 @@
-.PHONY: help local local-down run down restart reload build logs shell health check-config status clean test
+.PHONY: help local local-down run deploy down restart reload build logs shell health check-config status clean test
 
 # Variables
 COMPOSE := docker compose
@@ -7,30 +7,32 @@ NETWORK := www-network
 
 # Default target
 help:
-	@echo "Upfusion Audio API - Available Commands"
+	@echo "Upfusion Audio API"
 	@echo ""
-	@echo "Local Development:"
-	@echo "  make local         Start locally (port 8080)"
-	@echo "  make local-down    Stop local instance"
+	@echo "Local:"
+	@echo "  make local           Start locally (port 8080)"
+	@echo "  make local-down      Stop local instance"
 	@echo ""
 	@echo "Production:"
-	@echo "  make run           Start on server (requires www-network)"
-	@echo "  make down          Stop server instance"
-	@echo "  make restart       Restart container"
-	@echo "  make reload        Reload nginx config (no downtime)"
+	@echo "  make run             Start container"
+	@echo "  make deploy          Recreate with fresh config (near-zero downtime)"
+	@echo "  make build           Rebuild image from scratch (no cache)"
+	@echo "  make down            Stop container"
+	@echo "  make restart         Restart container"
+	@echo "  make reload          Reload nginx config without restart"
 	@echo ""
 	@echo "Monitoring:"
-	@echo "  make logs          Follow container logs"
-	@echo "  make shell         Open shell in container"
-	@echo "  make health        Check health endpoint"
-	@echo "  make status        Show container status"
-	@echo "  make check-config  Validate nginx config"
+	@echo "  make logs            Follow container logs"
+	@echo "  make shell           Open shell in container"
+	@echo "  make health          Check health endpoint"
+	@echo "  make status          Show container status"
+	@echo "  make check-config    Validate nginx config"
 	@echo ""
 	@echo "Testing:"
-	@echo "  make test          Run all endpoint tests"
+	@echo "  make test            Run all endpoint tests"
 	@echo ""
 	@echo "Cleanup:"
-	@echo "  make clean         Stop and remove containers"
+	@echo "  make clean           Stop and remove containers"
 
 # ── Local Development ──
 
@@ -50,9 +52,14 @@ local-down:
 
 run:
 	@echo "Starting on server..."
-	$(COMPOSE) up -d --build
+	$(COMPOSE) up -d
 	@echo "✓ Running on www-network"
 	@echo "  Health: make health"
+
+deploy:
+	@echo "Deploying (fresh config)..."
+	$(COMPOSE) up -d --force-recreate
+	@echo "✓ Deployed with fresh config"
 
 build:
 	@echo "Building with no cache..."
