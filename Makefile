@@ -41,7 +41,7 @@ local:
 	$(COMPOSE) -f docker-compose.yml -f docker-compose.local.yml up -d
 	@echo "✓ Running at http://127.0.0.1:8080"
 	@echo "  Health: http://127.0.0.1:8080/health"
-	@echo "  Stream: http://127.0.0.1:8080/stream/deftones/eros/destiny"
+	@echo "  Stream: http://127.0.0.1:8080/stream/upfusion/mix/axiom"
 
 local-down:
 	@echo "Stopping local instance..."
@@ -107,14 +107,14 @@ test:
 	@docker exec $(CONTAINER) wget -qO- http://127.0.0.1:8080/health && echo " ✓" || echo " ✗"
 	@echo ""
 	@echo "── Stream with valid referer ──"
-	@docker exec $(CONTAINER) wget -qS --header="Referer: https://upfusion.net/" -O /dev/null http://127.0.0.1:8080/stream/deftones/eros/destiny 2>&1 | head -1
+	@docker exec $(CONTAINER) wget -qS --header="Referer: https://upfusion.net/" -O /dev/null http://127.0.0.1:8080/stream/upfusion/mix/axiom 2>&1 | head -1
 	@echo ""
 	@echo "── Stream without referer (expect 403) ──"
-	@docker exec $(CONTAINER) wget -qS -O /dev/null http://127.0.0.1:8080/stream/deftones/eros/destiny 2>&1 | head -1
+	@docker exec $(CONTAINER) wget -qS -O /dev/null http://127.0.0.1:8080/stream/upfusion/mix/axiom 2>&1 | head -1
 	@echo ""
 	@echo "── All tracks ──"
-	@for track in destiny brenda melanie smile margot candy sable electra trempest diamond briana; do \
-		docker exec $(CONTAINER) wget -qO /dev/null --header="Referer: https://upfusion.net/" http://127.0.0.1:8080/stream/deftones/eros/$$track 2>/dev/null \
+	@for track in orthopraxy genome extinction axiom noir; do \
+		docker exec $(CONTAINER) wget -qO /dev/null --header="Referer: https://upfusion.net/" http://127.0.0.1:8080/stream/upfusion/mix/$$track 2>/dev/null \
 		&& echo "  ✓ $$track" || echo "  ✗ $$track"; \
 	done
 
