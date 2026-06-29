@@ -41,7 +41,7 @@ local:
 	$(COMPOSE) -f docker-compose.yml -f docker-compose.local.yml up -d
 	@echo "✓ Running at http://127.0.0.1:8080"
 	@echo "  Health: http://127.0.0.1:8080/health"
-	@echo "  Stream: http://127.0.0.1:8080/stream/upfusion/mix/axiom"
+	@echo "  Stream: http://127.0.0.1:8080/stream/upfusion/alternative/axiom"
 
 local-down:
 	@echo "Stopping local instance..."
@@ -107,14 +107,20 @@ test:
 	@docker exec $(CONTAINER) wget -qO- http://127.0.0.1:8080/health && echo " ✓" || echo " ✗"
 	@echo ""
 	@echo "── Stream with valid referer ──"
-	@docker exec $(CONTAINER) wget -qS --header="Referer: https://upfusion.net/" -O /dev/null http://127.0.0.1:8080/stream/upfusion/mix/axiom 2>&1 | head -1
+	@docker exec $(CONTAINER) wget -qS --header="Referer: https://upfusion.net/" -O /dev/null http://127.0.0.1:8080/stream/upfusion/alternative/axiom 2>&1 | head -1
 	@echo ""
 	@echo "── Stream without referer (expect 403) ──"
-	@docker exec $(CONTAINER) wget -qS -O /dev/null http://127.0.0.1:8080/stream/upfusion/mix/axiom 2>&1 | head -1
+	@docker exec $(CONTAINER) wget -qS -O /dev/null http://127.0.0.1:8080/stream/upfusion/alternative/axiom 2>&1 | head -1
 	@echo ""
-	@echo "── All tracks ──"
+	@echo "── Alternative tracks ──"
 	@for track in orthopraxy genome extinction axiom noir; do \
-		docker exec $(CONTAINER) wget -qO /dev/null --header="Referer: https://upfusion.net/" http://127.0.0.1:8080/stream/upfusion/mix/$$track 2>/dev/null \
+		docker exec $(CONTAINER) wget -qO /dev/null --header="Referer: https://upfusion.net/" http://127.0.0.1:8080/stream/upfusion/alternative/$$track 2>/dev/null \
+		&& echo "  ✓ $$track" || echo "  ✗ $$track"; \
+	done
+	@echo ""
+	@echo "── Jazz tracks ──"
+	@for track in spring-vibes d-flat-jazz cronus-fall hypnos-prelude poseidon-ocean axiom noir sigma; do \
+		docker exec $(CONTAINER) wget -qO /dev/null --header="Referer: https://upfusion.net/" http://127.0.0.1:8080/stream/upfusion/jazz/$$track 2>/dev/null \
 		&& echo "  ✓ $$track" || echo "  ✗ $$track"; \
 	done
 
